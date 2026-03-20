@@ -76,7 +76,11 @@ async def index(
         orders = []
 
     metrics = _build_dashboard_metrics(products, orders)
-    categories = ["Todos", "Bebidas", "Lanches", "Sobremesas", "Combos", "Gelados", "Vegano"]
+    seen: set[str] = set()
+    categories = ["Todos"] + [
+        p.category for p in products
+        if p.category and not (p.category in seen or seen.add(p.category))
+    ]
     return templates.TemplateResponse(
         "index.html",
         {
