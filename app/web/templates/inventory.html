@@ -1,33 +1,32 @@
-﻿{% extends "base.html" %}
-{% block title %}Estoque - Pulsar Cafe Lab{% endblock %}
+{% extends "base.html" %}
+{% block title %}Estoque - Pulsar Café Lab{% endblock %}
 
 {% block content %}
 <section class="panel rounded-2xl p-6">
   <h1 class="text-2xl font-bold">Estoque vivo</h1>
-  <p class="text-sm text-gray-600">Alertas de ruptura, itens de giro alto e sugestoes de reposicao.</p>
+  <p class="text-sm text-gray-600">Alertas de ruptura, itens de giro alto e sugestões de reposição.</p>
 
   <div class="grid md:grid-cols-3 gap-4 mt-4">
     <article class="border rounded-xl p-4">
-      <h2 class="font-bold mb-2">Itens criticos</h2>
+      <h2 class="font-bold mb-2">Itens críticos</h2>
       <ul class="text-sm space-y-1">
-        {% for item in critical_items %}<li>{{ item.name }} (alto giro)</li>{% else %}<li>Nenhum item critico agora.</li>{% endfor %}
+        {% for item in critical_items %}<li>{{ item.name }} (alto giro)</li>{% else %}<li>Nenhum item crítico agora.</li>{% endfor %}
       </ul>
     </article>
     <article class="border rounded-xl p-4">
       <h2 class="font-bold mb-2">Itens em falta</h2>
       <ul class="text-sm space-y-1">
-        {% for item in missing_items %}<li>{{ item.name }}</li>{% else %}<li>Nenhum item marcado como indisponivel.</li>{% endfor %}
+        {% for item in missing_items %}<li>{{ item.name }}</li>{% else %}<li>Nenhum item marcado como indisponível.</li>{% endfor %}
       </ul>
     </article>
     <article class="border rounded-xl p-4">
-      <h2 class="font-bold mb-2">Reposicao sugerida</h2>
+      <h2 class="font-bold mb-2">Reposição sugerida</h2>
       <ul class="text-sm space-y-1">
-        <li>Cafe expresso grao 1kg</li>
-        <li>Leite integral 12L</li>
-        <li>Tampa para copos 300ml</li>
+        <li>Café espresso grão 1 kg</li>
+        <li>Leite integral 12 L</li>
+        <li>Tampa para copos 300 ml</li>
       </ul>
     </article>
   </div>
 </section>
 {% endblock %}
-

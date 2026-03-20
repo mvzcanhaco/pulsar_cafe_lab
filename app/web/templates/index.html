@@ -1,5 +1,5 @@
-﻿{% extends "base.html" %}
-{% block title %}Dashboard - Pulsar Cafe Lab{% endblock %}
+{% extends "base.html" %}
+{% block title %}Dashboard - Pulsar Café Lab{% endblock %}
 
 {% block content %}
 <section class="mb-5">
@@ -29,31 +29,31 @@
 
 <section class="grid lg:grid-cols-3 gap-4 mb-5">
   <article class="panel rounded-xl p-4 lg:col-span-2">
-    <h2 class="text-lg font-bold">Modulos de automacao</h2>
+    <h2 class="text-lg font-bold">Módulos de automação</h2>
     <div class="grid md:grid-cols-2 gap-3 mt-3 text-sm">
       <div class="pill rounded-lg p-3">Caixa inteligente</div>
       <div class="pill rounded-lg p-3">Fila de pedidos</div>
       <div class="pill rounded-lg p-3">Estoque vivo</div>
       <div class="pill rounded-lg p-3">CRM e fidelidade</div>
-      <div class="pill rounded-lg p-3">Relatorios operacionais</div>
-      <div class="pill rounded-lg p-3">Governanca fiscal</div>
+      <div class="pill rounded-lg p-3">Relatórios operacionais</div>
+      <div class="pill rounded-lg p-3">Governança fiscal</div>
     </div>
   </article>
   <article class="panel rounded-xl p-4">
     <h2 class="text-lg font-bold">Radar operacional</h2>
     <ul class="mt-3 space-y-2 text-sm">
       <li class="bg-green-50 border border-green-200 rounded-lg p-2">Fila sob controle</li>
-      <li class="bg-amber-50 border border-amber-200 rounded-lg p-2">Reposicao sugerida para bebidas geladas</li>
+      <li class="bg-amber-50 border border-amber-200 rounded-lg p-2">Reposição sugerida para bebidas geladas</li>
       <li class="bg-blue-50 border border-blue-200 rounded-lg p-2">Campanha do dia ativa</li>
     </ul>
   </article>
 </section>
 
 <section class="panel rounded-2xl p-4 mb-3">
-  <h2 class="text-xl font-bold">Catalogo da loja</h2>
+  <h2 class="text-xl font-bold">Catálogo da loja</h2>
   <div class="mt-3 flex flex-wrap gap-2" id="category-filters">
     {% for category in categories %}
-    <button type="button" class="category-btn px-3 py-1.5 rounded-full border text-sm bg-white" data-category="{{ category }}">{{ category }}</button>
+    <button type="button" class="category-btn px-3 py-1.5 rounded-full border text-sm transition-colors" data-category="{{ category }}">{{ category }}</button>
     {% endfor %}
   </div>
 
@@ -141,8 +141,14 @@ function removeItem(id) {
 function applyCategoryFilter(category) {
   selectedCategory = category;
   document.querySelectorAll('.category-btn').forEach(btn => {
-    btn.classList.toggle('bg-amber-600', btn.dataset.category === category);
-    btn.classList.toggle('text-white', btn.dataset.category === category);
+    const active = btn.dataset.category === category;
+    // remove ambos antes de aplicar o estado correto
+    btn.classList.remove('bg-amber-600', 'text-white', 'bg-white', 'text-gray-700', 'border-amber-600');
+    if (active) {
+      btn.classList.add('bg-amber-600', 'text-white', 'border-amber-600');
+    } else {
+      btn.classList.add('bg-white', 'text-gray-700');
+    }
   });
   const cards = Array.from(document.querySelectorAll('[data-category][data-id]'));
   cards.forEach(card => {
@@ -170,4 +176,3 @@ recomputeCheckoutBar();
 applyCategoryFilter('Todos');
 </script>
 {% endblock %}
-

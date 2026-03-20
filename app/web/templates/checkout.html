@@ -1,14 +1,14 @@
-﻿{% extends "base.html" %}
-{% block title %}Checkout - Pulsar Cafe Lab{% endblock %}
+{% extends "base.html" %}
+{% block title %}Checkout - Pulsar Café Lab{% endblock %}
 
 {% block content %}
 <section class="panel rounded-2xl p-6 max-w-2xl mx-auto">
   <p class="text-xs uppercase tracking-wide text-gray-500">Checkout operacional</p>
-  <h1 class="text-2xl font-bold mt-1">{{ merchant.name if merchant else "Pulsar Cafe Lab" }}</h1>
+  <h1 class="text-2xl font-bold mt-1">{{ merchant.name if merchant else "Pulsar Café Lab" }}</h1>
   <p class="text-sm text-gray-600">Resumo limpo do pedido para iniciar pagamento no terminal.</p>
 
   <div class="mt-4 border rounded-xl p-4">
-    <div class="flex justify-between"><span>Nome do pedido</span><strong id="order-name">Pedido Balcao</strong></div>
+    <div class="flex justify-between"><span>Nome do pedido</span><strong id="order-name">Pedido Balcão</strong></div>
     <div class="flex justify-between mt-2"><span>Quantidade de itens</span><strong id="checkout-items">0</strong></div>
     <div class="flex justify-between mt-2"><span>Valor total</span><strong>R$ <span id="checkout-total">0.00</span></strong></div>
   </div>
@@ -73,4 +73,3 @@ document.getElementById('start-payment').addEventListener('click', createOrderAn
 renderCheckout();
 </script>
 {% endblock %}
-

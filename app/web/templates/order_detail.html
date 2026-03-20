@@ -1,5 +1,5 @@
-﻿{% extends "base.html" %}
-{% block title %}Pedido - Pulsar Cafe Lab{% endblock %}
+{% extends "base.html" %}
+{% block title %}Pedido - Pulsar Café Lab{% endblock %}
 
 {% block content %}
 <section class="panel rounded-2xl p-6 max-w-2xl mx-auto">
@@ -10,7 +10,7 @@
   <p class="text-xs text-gray-500 mt-1">#{{ order.id }}</p>
 
   <div class="mt-4 border rounded-xl p-4">
-    <div class="flex justify-between"><span>Nome da operacao</span><strong>Pulsar Cafe Lab</strong></div>
+    <div class="flex justify-between"><span>Nome da operação</span><strong>Pulsar Café Lab</strong></div>
     <div class="flex justify-between mt-2"><span>Nome do pedido</span><strong>Pedido #{{ order.id[:8] }}</strong></div>
     <div class="flex justify-between mt-2"><span>Quantidade de itens</span><strong>{{ order.line_items|length }}</strong></div>
     <div class="flex justify-between mt-2"><span>Valor total</span><strong>R$ {{ "%.2f"|format(order.total_cents/100) }}</strong></div>
@@ -60,4 +60,3 @@
   <a href="/checkout" class="inline-block mt-4 text-sm text-amber-700 hover:underline">Voltar</a>
 </section>
 {% endblock %}
-

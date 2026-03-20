@@ -112,8 +112,8 @@ async def operations_page(
 ):
     merchant = await merchant_uc.execute()
     operations_config = {
-        "integration_status": "ONLINE" if settings.fiserv_company_id else "CONFIG PENDENTE",
-        "environment": "SANDBOX" if settings.debug else "PRODUCAO",
+        "integration_status": "ONLINE" if settings.fiserv_company_id else "CONFIGURAÇÃO PENDENTE",
+        "environment": "SANDBOX" if settings.debug else "PRODUÇÃO",
         "payment_engine": "Fiserv CliSiTef",
         "merchant_name": merchant.name if merchant else "Nao cadastrado",
         "merchant_cnpj": settings.fiserv_merchant_cnpj or (merchant.cnpj if merchant else ""),
@@ -170,8 +170,8 @@ async def customers_page(
     orders = await order_repo.list_orders()
     recurring = max(12, len(orders) * 2)
     campaigns = [
-        {"name": "Combo Manha Pulsar", "reach": "08h-11h"},
-        {"name": "Retorno Pos-Almoco", "reach": "14h-17h"},
+        {"name": "Combo Manhã Pulsar", "reach": "08h–11h"},
+        {"name": "Retorno Pós-Almoço", "reach": "14h–17h"},
         {"name": "Clube Espresso", "reach": "Recorrentes"},
     ]
     return templates.TemplateResponse(
