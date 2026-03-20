@@ -79,6 +79,11 @@ def parse_sitef_response(raw: dict, order_id: str, amount_cents: int) -> Payment
     card_type_raw = str(raw.get("tipoCartao", "")).lower()
     card_type = _CARD_TYPE_MAP.get(card_type_raw, CardType.UNKNOWN)
 
+    try:
+        installments = int(raw.get("numeroParcelas", 1))
+    except (TypeError, ValueError):
+        installments = 1
+
     return Payment(
         id=str(uuid.uuid4()),
         order_id=order_id,
@@ -89,7 +94,7 @@ def parse_sitef_response(raw: dict, order_id: str, amount_cents: int) -> Payment
         auth_code=str(raw.get("codigoAutorizacao", "")),
         card_brand=str(raw.get("bandeira", "")),
         last4=str(raw.get("ultimos4Digitos", "")),
-        installments=int(raw.get("numeroParcelas", 1)),
+        installments=installments,
         merchant_receipt=str(raw.get("comprovanteEstabelecimento", "")),
         customer_receipt=str(raw.get("comprovantePortador", "")),
         error_message=_ERROR_MESSAGES.get(code) if result != PaymentResult.SUCCESS else None,

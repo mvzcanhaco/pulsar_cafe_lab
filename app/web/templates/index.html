@@ -1,109 +1,173 @@
-{% extends "base.html" %}
-{% block title %}Cardápio — Pulsar Café Lab{% endblock %}
+﻿{% extends "base.html" %}
+{% block title %}Dashboard - Pulsar Cafe Lab{% endblock %}
 
 {% block content %}
-<!-- Merchant info -->
-{% if merchant %}
-<div class="mb-6 bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 border border-amber-100">
-  <div class="w-12 h-12 rounded-full bg-amber-800 text-white flex items-center justify-center text-2xl">☕</div>
-  <div>
-    <p class="text-lg font-semibold text-gray-800">{{ merchant.name }}</p>
-    <p class="text-sm text-gray-500">{{ merchant.address }} &bull; {{ merchant.cnpj }}</p>
-  </div>
-</div>
-{% endif %}
-
-<h1 class="text-2xl font-bold text-gray-800 mb-4">Cardápio</h1>
-
-<!-- Cart summary (HTMX updated) -->
-<div id="cart-summary" class="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200 hidden">
-  <p class="text-sm font-medium text-amber-800">
-    🛒 <span id="cart-count">0</span> ite(ns) selecionado(s) &mdash;
-    <a href="#" onclick="submitOrder()" class="underline font-bold">Finalizar pedido →</a>
-  </p>
-</div>
-
-<!-- Product grid -->
-<form id="order-form" action="/orders/new" method="post">
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    {% for product in products %}
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col gap-2 hover:shadow-md transition">
-      <div class="flex items-center justify-between">
-        <span class="category-badge">{{ product.category or "Geral" }}</span>
-        {% if not product.available %}
-        <span class="text-xs text-gray-400 italic">Indisponível</span>
-        {% endif %}
+<section class="mb-5">
+  <p class="text-amber-100/80 text-sm">Automação comercial para cafeteria e operação de loja.</p>
+  <div class="mt-3 rounded-2xl p-6 bg-gradient-to-r from-orange-700 via-amber-700 to-red-700 text-white shadow-2xl">
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div>
+        <h1 class="text-3xl font-extrabold">Cockpit Comercial</h1>
+        <p class="text-amber-100 mt-1">Operação viva com foco em pedidos, caixa e integração.</p>
       </div>
-
-      <p class="font-semibold text-gray-800">{{ product.name }}</p>
-      {% if product.description %}
-      <p class="text-xs text-gray-500">{{ product.description }}</p>
-      {% endif %}
-
-      <p class="text-lg font-bold text-amber-700">R$ {{ "%.2f"|format(product.price_cents / 100) }}</p>
-
-      {% if product.available %}
-      <div class="flex items-center gap-2 mt-auto">
-        <label class="text-sm text-gray-600">Qtd:</label>
-        <input
-          type="number"
-          name="qty_{{ product.id }}"
-          id="qty_{{ product.id }}"
-          min="0" max="99" value="0"
-          class="w-16 border rounded px-2 py-1 text-sm text-center"
-          onchange="updateCart()"
-          data-product-id="{{ product.id }}"
-          data-price="{{ product.price_cents }}"
-        />
-      </div>
-      {% endif %}
+      <a href="/operations" class="bg-black/30 hover:bg-black/45 px-4 py-2 rounded-lg text-sm font-semibold">Abrir central operacional</a>
     </div>
+    <div class="mt-4 flex flex-wrap gap-2 text-xs">
+      <span class="px-2 py-1 rounded-full bg-black/25">{{ metrics.itens_cadastrados }} itens cadastrados</span>
+      <span class="px-2 py-1 rounded-full bg-black/25">{{ metrics.fila_ao_vivo }} na fila ao vivo</span>
+      <span class="px-2 py-1 rounded-full bg-black/25">{{ metrics.campanhas_ativas }} campanhas ativas</span>
+    </div>
+  </div>
+</section>
+
+<section class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+  <article class="panel rounded-xl p-4"><p class="text-xs text-gray-500">Pedidos hoje</p><p class="text-2xl font-bold">{{ metrics.pedidos_hoje }}</p></article>
+  <article class="panel rounded-xl p-4"><p class="text-xs text-gray-500">Ticket médio</p><p class="text-2xl font-bold">R$ {{ "%.2f"|format(metrics.ticket_medio_cents/100) }}</p></article>
+  <article class="panel rounded-xl p-4"><p class="text-xs text-gray-500">Carrinho ativo</p><p class="text-2xl font-bold">{{ metrics.carrinho_ativo }}</p></article>
+  <article class="panel rounded-xl p-4"><p class="text-xs text-gray-500">Fidelidade</p><p class="text-2xl font-bold">{{ metrics.fidelidade_percent }}%</p></article>
+</section>
+
+<section class="grid lg:grid-cols-3 gap-4 mb-5">
+  <article class="panel rounded-xl p-4 lg:col-span-2">
+    <h2 class="text-lg font-bold">Modulos de automacao</h2>
+    <div class="grid md:grid-cols-2 gap-3 mt-3 text-sm">
+      <div class="pill rounded-lg p-3">Caixa inteligente</div>
+      <div class="pill rounded-lg p-3">Fila de pedidos</div>
+      <div class="pill rounded-lg p-3">Estoque vivo</div>
+      <div class="pill rounded-lg p-3">CRM e fidelidade</div>
+      <div class="pill rounded-lg p-3">Relatorios operacionais</div>
+      <div class="pill rounded-lg p-3">Governanca fiscal</div>
+    </div>
+  </article>
+  <article class="panel rounded-xl p-4">
+    <h2 class="text-lg font-bold">Radar operacional</h2>
+    <ul class="mt-3 space-y-2 text-sm">
+      <li class="bg-green-50 border border-green-200 rounded-lg p-2">Fila sob controle</li>
+      <li class="bg-amber-50 border border-amber-200 rounded-lg p-2">Reposicao sugerida para bebidas geladas</li>
+      <li class="bg-blue-50 border border-blue-200 rounded-lg p-2">Campanha do dia ativa</li>
+    </ul>
+  </article>
+</section>
+
+<section class="panel rounded-2xl p-4 mb-3">
+  <h2 class="text-xl font-bold">Catalogo da loja</h2>
+  <div class="mt-3 flex flex-wrap gap-2" id="category-filters">
+    {% for category in categories %}
+    <button type="button" class="category-btn px-3 py-1.5 rounded-full border text-sm bg-white" data-category="{{ category }}">{{ category }}</button>
     {% endfor %}
   </div>
 
-  {% if not products %}
-  <div class="text-center py-16 text-gray-400">
-    <p class="text-4xl mb-2">☕</p>
-    <p>Nenhum produto cadastrado ainda.</p>
+  <article id="featured-card" class="mt-4 bg-gradient-to-r from-orange-100 to-amber-100 border border-amber-200 rounded-xl p-4">
+    <p class="text-xs uppercase tracking-wide text-amber-700">Destaque do menu</p>
+    <h3 id="featured-name" class="text-xl font-bold mt-1"></h3>
+    <p id="featured-meta" class="text-sm text-gray-600 mt-1"></p>
+  </article>
+
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4" id="products-grid">
+    {% for product in products %}
+    <article class="border rounded-xl p-3 bg-white" data-category="{{ product.category or 'Outros' }}" data-name="{{ product.name }}" data-price="{{ product.price_cents }}" data-id="{{ product.id }}">
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <p class="text-xs text-gray-500">{{ product.category or "Geral" }}</p>
+          <h4 class="font-bold">{{ product.name }}</h4>
+        </div>
+        <p class="font-bold text-amber-700">R$ {{ "%.2f"|format(product.price_cents/100) }}</p>
+      </div>
+      <p class="text-sm text-gray-600 mt-1">{{ product.description or "Item especial da casa." }}</p>
+      <div class="mt-3 flex items-center gap-2">
+        <button type="button" class="remove-btn px-2 py-1 border rounded" data-id="{{ product.id }}">-</button>
+        <span class="w-7 text-center qty" id="qty-{{ product.id }}">0</span>
+        <button type="button" class="add-btn px-2 py-1 border rounded bg-amber-600 text-white border-amber-700" data-id="{{ product.id }}" data-name="{{ product.name }}" data-price="{{ product.price_cents }}">+</button>
+      </div>
+    </article>
+    {% endfor %}
   </div>
-  {% endif %}
-</form>
+</section>
+
+<div id="checkout-bar" class="fixed bottom-0 left-0 right-0 bg-[#21140f] border-t border-white/10 text-amber-50 hidden">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="text-sm">
+      <p><span id="cart-items">0</span> itens no carrinho</p>
+      <p class="font-bold">Total: R$ <span id="cart-total">0.00</span></p>
+    </div>
+    <a href="/checkout" class="bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded-lg font-semibold">Abrir checkout</a>
+  </div>
+</div>
 
 <script>
-function updateCart() {
-  let total = 0;
+const cartKey = "pulsar_cart";
+let selectedCategory = "Todos";
+
+function readCart() {
+  try { return JSON.parse(localStorage.getItem(cartKey) || "{}"); } catch { return {}; }
+}
+function writeCart(cart) {
+  localStorage.setItem(cartKey, JSON.stringify(cart));
+}
+function syncQuantities() {
+  const cart = readCart();
+  document.querySelectorAll('.qty').forEach(el => {
+    const id = el.id.replace('qty-', '');
+    el.textContent = cart[id]?.quantity || 0;
+  });
+}
+function recomputeCheckoutBar() {
+  const cart = readCart();
   let count = 0;
-  document.querySelectorAll('input[data-product-id]').forEach(input => {
-    const qty = parseInt(input.value) || 0;
-    const price = parseInt(input.dataset.price) || 0;
-    total += qty * price;
-    count += qty;
-  });
-  const summary = document.getElementById('cart-summary');
-  document.getElementById('cart-count').textContent = count;
-  summary.classList.toggle('hidden', count === 0);
+  let total = 0;
+  Object.values(cart).forEach(item => { count += item.quantity; total += item.quantity * item.price_cents; });
+  document.getElementById('cart-items').textContent = count;
+  document.getElementById('cart-total').textContent = (total/100).toFixed(2);
+  document.getElementById('checkout-bar').classList.toggle('hidden', count === 0);
+}
+function addItem(id, name, price) {
+  const cart = readCart();
+  cart[id] = cart[id] || { product_id: id, name: name, price_cents: Number(price), quantity: 0 };
+  cart[id].quantity += 1;
+  writeCart(cart);
+  syncQuantities();
+  recomputeCheckoutBar();
+}
+function removeItem(id) {
+  const cart = readCart();
+  if (!cart[id]) return;
+  cart[id].quantity -= 1;
+  if (cart[id].quantity <= 0) delete cart[id];
+  writeCart(cart);
+  syncQuantities();
+  recomputeCheckoutBar();
 }
 
-function submitOrder() {
-  const items = [];
-  document.querySelectorAll('input[data-product-id]').forEach(input => {
-    const qty = parseInt(input.value) || 0;
-    if (qty > 0) {
-      items.push({ product_id: input.dataset.productId, quantity: qty });
-    }
+function applyCategoryFilter(category) {
+  selectedCategory = category;
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.classList.toggle('bg-amber-600', btn.dataset.category === category);
+    btn.classList.toggle('text-white', btn.dataset.category === category);
   });
-  if (!items.length) return;
-
-  fetch('/orders/new', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ items })
-  })
-  .then(r => r.json())
-  .then(order => {
-    window.location.href = '/orders/' + order.id;
-  })
-  .catch(err => alert('Erro ao criar pedido: ' + err));
+  const cards = Array.from(document.querySelectorAll('[data-category][data-id]'));
+  cards.forEach(card => {
+    const show = category === 'Todos' || card.dataset.category === category;
+    card.classList.toggle('hidden', !show);
+  });
+  refreshFeaturedCard();
 }
+
+function refreshFeaturedCard() {
+  const cards = Array.from(document.querySelectorAll('[data-category][data-id]')).filter(c => !c.classList.contains('hidden'));
+  if (!cards.length) return;
+  cards.sort((a, b) => Number(b.dataset.price) - Number(a.dataset.price));
+  const top = cards[0];
+  document.getElementById('featured-name').textContent = top.dataset.name;
+  document.getElementById('featured-meta').textContent = `${top.dataset.category} • R$ ${(Number(top.dataset.price)/100).toFixed(2)}`;
+}
+
+document.querySelectorAll('.add-btn').forEach(btn => btn.addEventListener('click', () => addItem(btn.dataset.id, btn.dataset.name, btn.dataset.price)));
+document.querySelectorAll('.remove-btn').forEach(btn => btn.addEventListener('click', () => removeItem(btn.dataset.id)));
+document.querySelectorAll('.category-btn').forEach(btn => btn.addEventListener('click', () => applyCategoryFilter(btn.dataset.category)));
+
+syncQuantities();
+recomputeCheckoutBar();
+applyCategoryFilter('Todos');
 </script>
 {% endblock %}
+

@@ -1,7 +1,7 @@
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.api.dependencies import get_create_order_usecase, get_order_repo
 from app.domain.models.order import Order, OrderState
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 
 class OrderItemInput(BaseModel):
     product_id: str
-    quantity: int = 1
+    quantity: int = Field(default=1, gt=0)
 
 
 class OrderCreate(BaseModel):

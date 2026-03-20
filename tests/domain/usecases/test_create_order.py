@@ -61,3 +61,17 @@ async def test_create_order_raises_for_unavailable_product():
     usecase = CreateOrderUseCase(MockOrderRepo(), MockInventoryRepo(PRODUCTS))
     with pytest.raises(ValueError, match="not available"):
         await usecase.execute([{"product_id": "inativo", "quantity": 1}])
+
+
+@pytest.mark.asyncio
+async def test_create_order_raises_for_non_positive_quantity():
+    usecase = CreateOrderUseCase(MockOrderRepo(), MockInventoryRepo(PRODUCTS))
+    with pytest.raises(ValueError, match="Quantity must be positive"):
+        await usecase.execute([{"product_id": "cafe", "quantity": 0}])
+
+
+@pytest.mark.asyncio
+async def test_create_order_raises_for_invalid_quantity_type():
+    usecase = CreateOrderUseCase(MockOrderRepo(), MockInventoryRepo(PRODUCTS))
+    with pytest.raises(ValueError, match="Invalid quantity"):
+        await usecase.execute([{"product_id": "cafe", "quantity": "abc"}])

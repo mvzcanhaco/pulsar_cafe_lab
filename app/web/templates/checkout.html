@@ -1,0 +1,76 @@
+﻿{% extends "base.html" %}
+{% block title %}Checkout - Pulsar Cafe Lab{% endblock %}
+
+{% block content %}
+<section class="panel rounded-2xl p-6 max-w-2xl mx-auto">
+  <p class="text-xs uppercase tracking-wide text-gray-500">Checkout operacional</p>
+  <h1 class="text-2xl font-bold mt-1">{{ merchant.name if merchant else "Pulsar Cafe Lab" }}</h1>
+  <p class="text-sm text-gray-600">Resumo limpo do pedido para iniciar pagamento no terminal.</p>
+
+  <div class="mt-4 border rounded-xl p-4">
+    <div class="flex justify-between"><span>Nome do pedido</span><strong id="order-name">Pedido Balcao</strong></div>
+    <div class="flex justify-between mt-2"><span>Quantidade de itens</span><strong id="checkout-items">0</strong></div>
+    <div class="flex justify-between mt-2"><span>Valor total</span><strong>R$ <span id="checkout-total">0.00</span></strong></div>
+  </div>
+
+  <div id="checkout-list" class="mt-4 space-y-2 text-sm"></div>
+
+  <div class="mt-5 flex gap-2">
+    <button id="start-payment" class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2 rounded-lg font-semibold">Iniciar pagamento</button>
+    <a href="/" class="border px-4 py-2 rounded-lg">Voltar</a>
+  </div>
+  <p id="checkout-status" class="text-sm text-gray-600 mt-3"></p>
+</section>
+
+<script>
+const cartKey = "pulsar_cart";
+
+function readCart() {
+  try { return JSON.parse(localStorage.getItem(cartKey) || "{}"); } catch { return {}; }
+}
+function cartItems() {
+  return Object.values(readCart()).filter(item => item.quantity > 0);
+}
+function renderCheckout() {
+  const items = cartItems();
+  const qtd = items.reduce((acc, item) => acc + item.quantity, 0);
+  const total = items.reduce((acc, item) => acc + item.quantity * item.price_cents, 0);
+  document.getElementById('checkout-items').textContent = qtd;
+  document.getElementById('checkout-total').textContent = (total / 100).toFixed(2);
+
+  const list = document.getElementById('checkout-list');
+  list.innerHTML = '';
+  items.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'border rounded-lg p-2 flex justify-between';
+    row.innerHTML = `<span>${item.name} x${item.quantity}</span><strong>R$ ${((item.quantity * item.price_cents)/100).toFixed(2)}</strong>`;
+    list.appendChild(row);
+  });
+}
+
+async function createOrderAndGo() {
+  const items = cartItems().map(i => ({ product_id: i.product_id, quantity: i.quantity }));
+  if (!items.length) {
+    document.getElementById('checkout-status').textContent = 'Carrinho vazio. Volte ao dashboard para adicionar itens.';
+    return;
+  }
+  document.getElementById('checkout-status').textContent = 'Criando pedido e enviando para etapa de pagamento...';
+  const response = await fetch('/orders/new', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items }),
+  });
+  const payload = await response.json();
+  if (!response.ok || payload.error) {
+    document.getElementById('checkout-status').textContent = payload.error || 'Erro ao criar pedido.';
+    return;
+  }
+  localStorage.removeItem(cartKey);
+  window.location.href = `/orders/${payload.id}`;
+}
+
+document.getElementById('start-payment').addEventListener('click', createOrderAndGo);
+renderCheckout();
+</script>
+{% endblock %}
+

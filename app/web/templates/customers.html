@@ -1,0 +1,25 @@
+﻿{% extends "base.html" %}
+{% block title %}Clientes - Pulsar Cafe Lab{% endblock %}
+
+{% block content %}
+<section class="panel rounded-2xl p-6">
+  <h1 class="text-2xl font-bold">Clientes e fidelidade</h1>
+  <p class="text-sm text-gray-600">Recorrencia, campanhas e historico resumido para CRM de loja.</p>
+
+  <div class="grid md:grid-cols-3 gap-4 mt-4">
+    <article class="border rounded-xl p-4">
+      <p class="text-xs text-gray-500">Clientes recorrentes</p>
+      <p class="text-3xl font-bold mt-1">{{ recurring }}</p>
+    </article>
+    <article class="border rounded-xl p-4 md:col-span-2">
+      <h2 class="font-bold">Campanhas ativas</h2>
+      <ul class="mt-2 text-sm space-y-2">
+        {% for campaign in campaigns %}
+        <li class="flex justify-between border rounded p-2"><span>{{ campaign.name }}</span><strong>{{ campaign.reach }}</strong></li>
+        {% endfor %}
+      </ul>
+    </article>
+  </div>
+</section>
+{% endblock %}
+

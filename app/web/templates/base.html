@@ -1,45 +1,45 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Pulsar Café Lab{% endblock %}</title>
+  <title>{% block title %}Pulsar Cafe Lab{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/htmx.org@2.0.3"></script>
   <style>
-    .category-badge { @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800; }
+    :root {
+      --bg-1: #1b130f;
+      --bg-2: #2f1f17;
+      --card: #fff9f4;
+      --text-main: #2a1a13;
+      --brand-1: #c46a2d;
+      --brand-2: #91481f;
+      --accent: #efd9c5;
+    }
+    body { background: radial-gradient(circle at 20% 10%, #3b2418, #180f0b 60%); color: #f8eee6; }
+    .app-shell { background: rgba(20, 13, 10, 0.35); backdrop-filter: blur(4px); }
+    .panel { background: var(--card); color: var(--text-main); }
+    .pill { background: #f7e2d0; color: #6e3a1a; }
   </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans">
-
-  <!-- Navbar -->
-  <nav class="bg-amber-800 text-white shadow-md">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="/" class="text-xl font-bold tracking-tight">☕ Pulsar Café Lab</a>
-      <div class="flex gap-4 text-sm">
-        <a href="/" class="hover:text-amber-200 transition">Cardápio</a>
-        <a href="/orders" class="hover:text-amber-200 transition">Pedidos</a>
-        <a href="/docs" class="hover:text-amber-200 transition" target="_blank">API Docs</a>
-      </div>
+<body class="min-h-screen font-[ui-sans-serif]">
+  <header class="border-b border-white/10 app-shell sticky top-0 z-20">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <a href="/" class="text-xl font-bold tracking-tight">Pulsar Cafe Lab</a>
+      <nav class="text-sm flex items-center gap-3 text-amber-100/90">
+        <a href="/" class="hover:text-white">Dashboard</a>
+        <a href="/checkout" class="hover:text-white">Checkout</a>
+        <a href="/orders" class="hover:text-white">Pedidos</a>
+        <a href="/inventory" class="hover:text-white">Estoque</a>
+        <a href="/customers" class="hover:text-white">Clientes</a>
+        <a href="/operations" class="hover:text-white">Central Operacional</a>
+      </nav>
     </div>
-  </nav>
+  </header>
 
-  <!-- Flash messages -->
-  {% if flash %}
-  <div id="flash" class="max-w-5xl mx-auto mt-4 px-4">
-    <div class="rounded-lg p-3 {% if flash.type == 'error' %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">
-      {{ flash.message }}
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- Main content -->
-  <main class="max-w-5xl mx-auto px-4 py-6">
+  <main class="max-w-6xl mx-auto px-4 py-6 pb-28">
     {% block content %}{% endblock %}
   </main>
-
-  <footer class="text-center text-xs text-gray-400 py-6">
-    Pulsar Café Lab &mdash; Automação Comercial Fiserv/Clover
-  </footer>
 </body>
 </html>
+

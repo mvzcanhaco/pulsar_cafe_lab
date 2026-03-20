@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from sqlalchemy import select
@@ -7,16 +8,35 @@ from app.data.orm_models import PaymentORM
 from app.domain.models.payment import CardType, Payment, PaymentResult
 from app.domain.repositories.payment_repository import PaymentRepository
 
+logger = logging.getLogger(__name__)
+
+
+def _safe_result(value: str) -> PaymentResult:
+    try:
+        return PaymentResult(value)
+    except ValueError:
+        logger.warning("Unknown payment result '%s' in database. Falling back to FAIL.", value)
+        return PaymentResult.FAIL
+
+
+def _safe_card_type(value: str) -> CardType:
+    try:
+        return CardType(value)
+    except ValueError:
+        logger.warning("Unknown card type '%s' in database. Falling back to UNKNOWN.", value)
+        return CardType.UNKNOWN
+
 
 def _to_domain(orm: PaymentORM) -> Payment:
     return Payment(
         id=orm.id,
         order_id=orm.order_id,
+        idempotency_key=orm.idempotency_key,
         amount_cents=orm.amount_cents,
         tip_amount_cents=orm.tip_amount_cents,
         tax_amount_cents=orm.tax_amount_cents,
-        result=PaymentResult(orm.result),
-        card_type=CardType(orm.card_type),
+        result=_safe_result(orm.result),
+        card_type=_safe_card_type(orm.card_type),
         last4=orm.last4,
         nsu=orm.nsu,
         auth_code=orm.auth_code,
@@ -37,6 +57,7 @@ class SqlPaymentRepository(PaymentRepository):
         orm = PaymentORM(
             id=payment.id,
             order_id=payment.order_id,
+            idempotency_key=payment.idempotency_key,
             amount_cents=payment.amount_cents,
             tip_amount_cents=payment.tip_amount_cents,
             tax_amount_cents=payment.tax_amount_cents,
@@ -64,3 +85,9 @@ class SqlPaymentRepository(PaymentRepository):
         stmt = select(PaymentORM).where(PaymentORM.order_id == order_id)
         result = await self._session.execute(stmt)
         return [_to_domain(row) for row in result.scalars()]
+
+    async def get_by_idempotency_key(self, key: str) -> Optional[Payment]:
+        stmt = select(PaymentORM).where(PaymentORM.idempotency_key == key)
+        result = await self._session.execute(stmt)
+        orm = result.scalar_one_or_none()
+        return _to_domain(orm) if orm else None

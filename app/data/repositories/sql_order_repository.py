@@ -1,4 +1,5 @@
 import uuid
+import logging
 from typing import Optional
 
 from sqlalchemy import select
@@ -9,11 +10,21 @@ from app.data.orm_models import LineItemORM, OrderORM
 from app.domain.models.order import LineItem, Order, OrderState
 from app.domain.repositories.order_repository import OrderRepository
 
+logger = logging.getLogger(__name__)
+
+
+def _safe_order_state(value: str) -> OrderState:
+    try:
+        return OrderState(value)
+    except ValueError:
+        logger.warning("Unknown order state '%s' in database. Falling back to OPEN.", value)
+        return OrderState.OPEN
+
 
 def _to_domain(orm: OrderORM) -> Order:
     return Order(
         id=orm.id,
-        state=OrderState(orm.state),
+        state=_safe_order_state(orm.state),
         note=orm.note,
         currency=orm.currency,
         merchant_id=orm.merchant_id,

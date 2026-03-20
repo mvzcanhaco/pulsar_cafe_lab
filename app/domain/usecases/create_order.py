@@ -21,6 +21,14 @@ class CreateOrderUseCase:
         """
         line_items: list[LineItem] = []
         for item in items:
+            quantity_raw = item.get("quantity", 1)
+            try:
+                quantity = int(quantity_raw)
+            except (TypeError, ValueError):
+                raise ValueError(f"Invalid quantity for product {item.get('product_id')}: {quantity_raw}")
+            if quantity <= 0:
+                raise ValueError(f"Quantity must be positive for product {item.get('product_id')}")
+
             product = await self._inventory.get_product(item["product_id"])
             if product is None:
                 raise ValueError(f"Product not found: {item['product_id']}")
@@ -32,7 +40,7 @@ class CreateOrderUseCase:
                     id=str(uuid.uuid4()),
                     name=product.name,
                     price_cents=product.price_cents,
-                    quantity=item.get("quantity", 1),
+                    quantity=quantity,
                 )
             )
 

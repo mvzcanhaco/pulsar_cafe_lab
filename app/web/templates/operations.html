@@ -1,0 +1,46 @@
+﻿{% extends "base.html" %}
+{% block title %}Central Operacional - Pulsar Cafe Lab{% endblock %}
+
+{% block content %}
+<section class="panel rounded-2xl p-6">
+  <h1 class="text-2xl font-bold">Central operacional</h1>
+  <p class="text-sm text-gray-600 mt-1">Painel tecnico para suporte, configuracao e auditoria da integracao.</p>
+
+  <div class="grid md:grid-cols-2 gap-4 mt-5 text-sm">
+    <article class="border rounded-xl p-4">
+      <h2 class="font-bold mb-2">Status da integracao</h2>
+      <p><strong>Status:</strong> {{ ops.integration_status }}</p>
+      <p><strong>Ambiente:</strong> {{ ops.environment }}</p>
+      <p><strong>Motor:</strong> {{ ops.payment_engine }}</p>
+      <p><strong>Sitef:</strong> {{ ops.sitef_endpoint }}</p>
+    </article>
+
+    <article class="border rounded-xl p-4">
+      <h2 class="font-bold mb-2">Dados do estabelecimento</h2>
+      <p><strong>Nome:</strong> {{ ops.merchant_name }}</p>
+      <p><strong>CNPJ estabelecimento:</strong> {{ ops.merchant_cnpj or 'Nao informado' }}</p>
+      <p><strong>CNPJ automacao:</strong> {{ ops.automation_cnpj or 'Nao informado' }}</p>
+      <p><strong>App ID:</strong> {{ ops.app_id or 'Nao informado' }}</p>
+    </article>
+
+    <article class="border rounded-xl p-4">
+      <h2 class="font-bold mb-2">Dados tecnicos do app</h2>
+      <p><strong>Pacote:</strong> {{ ops.app_package }}</p>
+      <p><strong>Versao:</strong> {{ ops.app_version }}</p>
+      <p><strong>Funcao padrao:</strong> {{ ops.default_function }}</p>
+      <p><strong>Timeout operador:</strong> {{ ops.operator_timeout_seconds }}s</p>
+    </article>
+
+    <article class="border rounded-xl p-4">
+      <h2 class="font-bold mb-2">Rotinas ativas</h2>
+      <ul class="space-y-1">
+        <li>Checkout integrado</li>
+        <li>Monitor de fila</li>
+        <li>Alerta de estoque</li>
+        <li>Campanhas de retorno</li>
+      </ul>
+    </article>
+  </div>
+</section>
+{% endblock %}
+

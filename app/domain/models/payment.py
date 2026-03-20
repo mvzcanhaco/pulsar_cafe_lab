@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class PaymentResult(str, Enum):
@@ -25,6 +25,7 @@ class CardType(str, Enum):
 class Payment(BaseModel):
     id: str
     order_id: str
+    idempotency_key: Optional[str] = None
     amount_cents: int
     tip_amount_cents: int = 0
     tax_amount_cents: int = 0
@@ -38,7 +39,7 @@ class Payment(BaseModel):
     installments: int = 1
     merchant_receipt: str = ""
     customer_receipt: str = ""
-    created_at: datetime = datetime.now()
+    created_at: datetime = Field(default_factory=datetime.now)
     error_message: Optional[str] = None
 
     @property

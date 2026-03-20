@@ -4,7 +4,7 @@ SQLAlchemy ORM models — data layer only, not exposed to domain.
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.data.database import Base
@@ -66,9 +66,14 @@ class LineItemORM(Base):
 
 class PaymentORM(Base):
     __tablename__ = "payments"
+    __table_args__ = (
+        UniqueConstraint("idempotency_key", name="uq_payments_idempotency_key"),
+    )
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
     order_id: Mapped[str] = mapped_column(ForeignKey("orders.id"), nullable=False)
+    # Chave de idempotência: garante que requisições repetidas retornem o mesmo pagamento
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=True, index=True)
     amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)
     tip_amount_cents: Mapped[int] = mapped_column(Integer, default=0)
     tax_amount_cents: Mapped[int] = mapped_column(Integer, default=0)
