@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Pulsar Café Lab{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+  <style>
+    .category-badge { @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+
+  <!-- Navbar -->
+  <nav class="bg-amber-800 text-white shadow-md">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/" class="text-xl font-bold tracking-tight">☕ Pulsar Café Lab</a>
+      <div class="flex gap-4 text-sm">
+        <a href="/" class="hover:text-amber-200 transition">Cardápio</a>
+        <a href="/orders" class="hover:text-amber-200 transition">Pedidos</a>
+        <a href="/docs" class="hover:text-amber-200 transition" target="_blank">API Docs</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash messages -->
+  {% if flash %}
+  <div id="flash" class="max-w-5xl mx-auto mt-4 px-4">
+    <div class="rounded-lg p-3 {% if flash.type == 'error' %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">
+      {{ flash.message }}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Main content -->
+  <main class="max-w-5xl mx-auto px-4 py-6">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="text-center text-xs text-gray-400 py-6">
+    Pulsar Café Lab &mdash; Automação Comercial Fiserv/Clover
+  </footer>
+</body>
+</html>

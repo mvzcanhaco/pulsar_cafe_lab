@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Cardápio — Pulsar Café Lab{% endblock %}
+
+{% block content %}
+<!-- Merchant info -->
+{% if merchant %}
+<div class="mb-6 bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 border border-amber-100">
+  <div class="w-12 h-12 rounded-full bg-amber-800 text-white flex items-center justify-center text-2xl">☕</div>
+  <div>
+    <p class="text-lg font-semibold text-gray-800">{{ merchant.name }}</p>
+    <p class="text-sm text-gray-500">{{ merchant.address }} &bull; {{ merchant.cnpj }}</p>
+  </div>
+</div>
+{% endif %}
+
+<h1 class="text-2xl font-bold text-gray-800 mb-4">Cardápio</h1>
+
+<!-- Cart summary (HTMX updated) -->
+<div id="cart-summary" class="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200 hidden">
+  <p class="text-sm font-medium text-amber-800">
+    🛒 <span id="cart-count">0</span> ite(ns) selecionado(s) &mdash;
+    <a href="#" onclick="submitOrder()" class="underline font-bold">Finalizar pedido →</a>
+  </p>
+</div>
+
+<!-- Product grid -->
+<form id="order-form" action="/orders/new" method="post">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for product in products %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col gap-2 hover:shadow-md transition">
+      <div class="flex items-center justify-between">
+        <span class="category-badge">{{ product.category or "Geral" }}</span>
+        {% if not product.available %}
+        <span class="text-xs text-gray-400 italic">Indisponível</span>
+        {% endif %}
+      </div>
+
+      <p class="font-semibold text-gray-800">{{ product.name }}</p>
+      {% if product.description %}
+      <p class="text-xs text-gray-500">{{ product.description }}</p>
+      {% endif %}
+
+      <p class="text-lg font-bold text-amber-700">R$ {{ "%.2f"|format(product.price_cents / 100) }}</p>
+
+      {% if product.available %}
+      <div class="flex items-center gap-2 mt-auto">
+        <label class="text-sm text-gray-600">Qtd:</label>
+        <input
+          type="number"
+          name="qty_{{ product.id }}"
+          id="qty_{{ product.id }}"
+          min="0" max="99" value="0"
+          class="w-16 border rounded px-2 py-1 text-sm text-center"
+          onchange="updateCart()"
+          data-product-id="{{ product.id }}"
+          data-price="{{ product.price_cents }}"
+        />
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if not products %}
+  <div class="text-center py-16 text-gray-400">
+    <p class="text-4xl mb-2">☕</p>
+    <p>Nenhum produto cadastrado ainda.</p>
+  </div>
+  {% endif %}
+</form>
+
+<script>
+function updateCart() {
+  let total = 0;
+  let count = 0;
+  document.querySelectorAll('input[data-product-id]').forEach(input => {
+    const qty = parseInt(input.value) || 0;
+    const price = parseInt(input.dataset.price) || 0;
+    total += qty * price;
+    count += qty;
+  });
+  const summary = document.getElementById('cart-summary');
+  document.getElementById('cart-count').textContent = count;
+  summary.classList.toggle('hidden', count === 0);
+}
+
+function submitOrder() {
+  const items = [];
+  document.querySelectorAll('input[data-product-id]').forEach(input => {
+    const qty = parseInt(input.value) || 0;
+    if (qty > 0) {
+      items.push({ product_id: input.dataset.productId, quantity: qty });
+    }
+  });
+  if (!items.length) return;
+
+  fetch('/orders/new', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items })
+  })
+  .then(r => r.json())
+  .then(order => {
+    window.location.href = '/orders/' + order.id;
+  })
+  .catch(err => alert('Erro ao criar pedido: ' + err));
+}
+</script>
+{% endblock %}

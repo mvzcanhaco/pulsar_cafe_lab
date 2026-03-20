@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Pedido #{{ order.id[:8] }} — Pulsar Café Lab{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto">
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-xl font-bold text-gray-800">Pedido</h1>
+      <span class="px-2 py-1 rounded text-xs font-bold
+        {% if order.state == 'PAID' %}bg-green-100 text-green-700
+        {% elif order.state == 'OPEN' %}bg-blue-100 text-blue-700
+        {% elif order.state == 'VOIDED' %}bg-red-100 text-red-700
+        {% else %}bg-gray-100 text-gray-600{% endif %}">
+        {{ order.state }}
+      </span>
+    </div>
+    <p class="font-mono text-xs text-gray-400 mb-4">#{{ order.id }}</p>
+
+    <!-- Line items -->
+    <table class="w-full text-sm mb-4">
+      <thead>
+        <tr class="text-left text-gray-500 border-b">
+          <th class="pb-1">Item</th>
+          <th class="pb-1 text-center">Qtd</th>
+          <th class="pb-1 text-right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in order.line_items %}
+        <tr class="border-b border-gray-50">
+          <td class="py-2">{{ item.name }}</td>
+          <td class="py-2 text-center">{{ item.quantity }}</td>
+          <td class="py-2 text-right font-medium">R$ {{ "%.2f"|format(item.price_cents * item.quantity / 100) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2" class="pt-3 font-bold text-gray-700">Total</td>
+          <td class="pt-3 text-right font-bold text-amber-700 text-lg">
+            R$ {{ "%.2f"|format(order.total_cents / 100) }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <!-- Payment section -->
+    {% if order.state == 'OPEN' %}
+    <div id="payment-section">
+      <button
+        id="pay-btn"
+        hx-post="/orders/{{ order.id }}/pay"
+        hx-target="#payment-result"
+        hx-swap="outerHTML"
+        hx-indicator="#pay-spinner"
+        class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-3 rounded-lg transition"
+      >
+        💳 Pagar no Terminal
+      </button>
+      <div id="pay-spinner" class="htmx-indicator text-center text-sm text-gray-500 mt-2">
+        Aguardando terminal...
+      </div>
+    </div>
+    <div id="payment-result"></div>
+    {% endif %}
+
+    {% if payments %}
+    <div class="mt-4 pt-4 border-t">
+      <p class="text-sm font-semibold text-gray-600 mb-2">Pagamentos</p>
+      {% for payment in payments %}
+      <div class="text-sm bg-gray-50 rounded-lg p-3 mb-2">
+        <div class="flex justify-between">
+          <span class="font-medium">{{ payment.result }}</span>
+          <span class="text-gray-500">{{ payment.card_brand }} {{ payment.last4 and "****" + payment.last4 }}</span>
+        </div>
+        {% if payment.nsu %}
+        <p class="text-xs text-gray-400 mt-1">NSU: {{ payment.nsu }} &bull; Auth: {{ payment.auth_code }}</p>
+        {% endif %}
+        {% if payment.error_message %}
+        <p class="text-xs text-red-500 mt-1">{{ payment.error_message }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+
+  <div class="mt-4 text-center">
+    <a href="/orders" class="text-sm text-amber-700 hover:underline">← Voltar aos pedidos</a>
+  </div>
+</div>
+{% endblock %}
